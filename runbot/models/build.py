@@ -410,7 +410,6 @@ class runbot_build(models.Model):
                 else:
                     v['job'] = jobs[jobs.index(build.job) + 1]
                 build.write(v)
-            build.refresh()
 
             # run job
             pid = None
