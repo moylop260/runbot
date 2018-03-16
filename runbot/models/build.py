@@ -519,6 +519,19 @@ class runbot_build(models.Model):
                                    glob.glob(build._path('*/__manifest__.py')))
                 ]
 
+            # check if an revdep build is needed
+            elif build.branch_id.sticky:
+                for revdep_repo in self.env['runbot.repo'].search([('id', '!=', build.repo_id.id), ('dependency_ids', 'in', build.repo_id.id), ('rev_dep_build', '=', True)]):
+                    repo_id, closest_name, server_match = build._get_closest_branch_name(revdep_repo.id)
+                    _logger.debug('branch %s of %s: %s match branch %s of %s',
+                                  build.branch_id.name, build.repo_id.name,
+                                  server_match, closest_name, repo.name)
+                    build._log(
+                        'Building environment for reverse dependency',
+                        '%s match branch %s of %s' % (server_match, closest_name, repo.name)
+                    )
+                    # repo._git_export(closest_name, build._path())
+
             # move all addons to server addons path
             for module in uniq_list(glob.glob(build._path('addons/*')) + modules_to_move):
                 basename = os.path.basename(module)
@@ -750,7 +763,7 @@ class runbot_build(models.Model):
         # reset job_start to an accurate job_20 job_time
         build.write({'job_start': now()})
         return self._spawn(cmd, lock_path, log_path, cpu_limit=2100, env=env)
-
+    
     def _coverage_env(self, build):
         return dict(os.environ, COVERAGE_FILE=build._path('.coverage'))
 

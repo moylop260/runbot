@@ -46,6 +46,7 @@ class runbot_repo(models.Model):
         'runbot.repo', 'runbot_repo_dep_rel', column1='dependant_id', column2='dependency_id',
         string='Extra dependencies',
         help="Community addon repos which need to be present to run tests.")
+    rev_dep_build = fields.Boolean('Build when dependencies are built')  # build this repo with the dependency when a dependency build is triggered
     token = fields.Char("Github token", groups="runbot.group_runbot_admin")
     group_ids = fields.Many2many('res.groups', string='Limited to groups')
 
