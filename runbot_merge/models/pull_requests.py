@@ -345,6 +345,7 @@ class PullRequests(models.Model):
                 s.statuses = pprint.pformat(json.loads(c.statuses))
 
     def _parse_command(self, commandstring):
+        print(f'_parse_command({commandstring})')
         m = re.match(r'(\w+)(?:([+-])|=(.*))?', commandstring)
         if not m:
             return None
@@ -417,7 +418,7 @@ class PullRequests(models.Model):
         for command, param in commands.items():
             ok = False
             if command == 'retry':
-                if is_author and self.state == 'error':
+                if (is_author or is_reviewer) and self.state == 'error':
                     ok = True
                     self.state = 'ready'
             elif command == 'review':
