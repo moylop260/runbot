@@ -345,7 +345,6 @@ class PullRequests(models.Model):
                 s.statuses = pprint.pformat(json.loads(c.statuses))
 
     def _parse_command(self, commandstring):
-        print(f'_parse_command({commandstring})')
         m = re.match(r'(\w+)(?:([+-])|=(.*))?', commandstring)
         if not m:
             return None
