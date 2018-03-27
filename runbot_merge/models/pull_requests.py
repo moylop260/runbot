@@ -397,9 +397,9 @@ class PullRequests(models.Model):
         is_admin = (author.reviewer and self.author != author) or (author.self_reviewer and self.author == author)
         is_reviewer = is_admin or self in author.delegate_reviewer
         # TODO: should delegate reviewers be able to retry PRs?
-        is_author = is_admin or self.author == author
+        is_author = is_reviewer or self.author == author
 
-        if not (is_author or is_reviewer or is_admin):
+        if not is_author:
             # no point even parsing commands
             _logger.info("ignoring comment of %s (%s): no ACL to %s:%s",
                           author.github_login, author.display_name,
@@ -418,7 +418,7 @@ class PullRequests(models.Model):
         for command, param in commands.items():
             ok = False
             if command == 'retry':
-                if (is_author or is_reviewer) and self.state == 'error':
+                if is_author and self.state == 'error':
                     ok = True
                     self.state = 'ready'
             elif command == 'review':

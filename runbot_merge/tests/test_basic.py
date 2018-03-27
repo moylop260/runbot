@@ -419,7 +419,7 @@ class TestRetry:
             ('number', '=', prx.number)
         ]).state == 'merged'
 
-    @pytest.mark.parametrize('disabler', ['user', 'reviewer'])
+    @pytest.mark.parametrize('disabler', ['user', 'other', 'reviewer'])
     def test_retry_disable(self, env, repo, disabler):
         m = repo.make_commit(None, 'initial', None, tree={'m': 'm'})
         repo.make_ref('heads/master', m)
@@ -429,7 +429,7 @@ class TestRetry:
         prx = repo.make_pr('title', 'body', target='master', ctid=c2, user='user')
         repo.post_status(prx.head, 'success', 'ci/runbot')
         repo.post_status(prx.head, 'success', 'legal/cla')
-        prx.post_comment('hansen r+', "reviewer")
+        prx.post_comment('hansen r+ delegate=other', "reviewer")
         env['runbot_merge.project']._check_progress()
         assert env['runbot_merge.pull_requests'].search([
             ('repository.name', '=', 'odoo/odoo'),
